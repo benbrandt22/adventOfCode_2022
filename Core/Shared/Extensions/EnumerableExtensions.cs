@@ -1,4 +1,4 @@
-﻿namespace Core.Extensions;
+﻿namespace Core.Shared.Extensions;
 
 public static class EnumerableExtensions
 {

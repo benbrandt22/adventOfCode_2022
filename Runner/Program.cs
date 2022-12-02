@@ -1,6 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using Core.Modules;
+using Core.Shared.Modules;
 using NodaTime;
 using NodaTime.Extensions;
 

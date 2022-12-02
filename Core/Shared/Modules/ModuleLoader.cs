@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace Core.Modules;
+namespace Core.Shared.Modules;
 
 public static class ModuleLoader
 {

@@ -1,4 +1,4 @@
-﻿namespace Core.Modules;
+﻿namespace Core.Shared.Modules;
 
 public interface IDayModule
 {

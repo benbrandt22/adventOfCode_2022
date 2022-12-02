@@ -1,6 +1,6 @@
-﻿using Core.Modules;
-using Core.Shared;
-using Core.Extensions;
+﻿using Core.Shared;
+using Core.Shared.Extensions;
+using Core.Shared.Modules;
 
 namespace Core.Day1;
 
