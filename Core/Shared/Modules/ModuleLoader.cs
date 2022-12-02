@@ -1,21 +1,20 @@
-﻿using NodaTime;
-
-namespace Core.Shared.Modules;
+﻿namespace Core.Shared.Modules;
 
 public static class ModuleLoader
 {
-    public static IDayModule GetModuleFor(LocalDate date)
+    /// <summary>
+    /// Gets the module for the specified day. If day is not specified, gets the latest available (highest day)
+    /// </summary>
+    public static IDayModule GetModule(int? day = null)
     {
-        if (date.Year == 2022 && date.Month == 12)
+        var modules = GetAllModules().OrderBy(m => m.Day).ToList();
+        if (day.HasValue)
         {
-            return GetModuleForDay(date.Day);
+            return modules.FirstOrDefault(m => m.Day == day) ?? new DayNotFoundModule();
         }
-        return new DayNotFoundModule();
+
+        return modules.Last();
     }
-    
-    public static IDayModule GetModuleForDay(int day) =>
-        GetAllModules()
-            .FirstOrDefault(m => m.Day == day) ?? new DayNotFoundModule();
 
     private static IEnumerable<IDayModule> GetAllModules() =>
         AppDomain.CurrentDomain.GetAssemblies()

@@ -8,10 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="NodaTime" Version="3.1.6" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Content Include="Day1\day1-sample.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
