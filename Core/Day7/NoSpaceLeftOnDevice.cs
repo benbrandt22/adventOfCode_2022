@@ -66,20 +66,20 @@ public class NoSpaceLeftOnDevice : BaseDayModule
 
     private FileSystemAnalysisItem ToAnalysisItem(string line)
     {
-        var analysisItems = new List<(Regex Format, Type ItemType)>
+        var consoleLineParsers = new List<(Regex Format, Func<Match, FileSystemAnalysisItem> Factory)>()
         {
-            (Format: ChangeDirectoryCommand.LineFormat, ItemType: typeof(ChangeDirectoryCommand)),
-            (Format: ListCommand.LineFormat, ItemType: typeof(ListCommand)),
-            (Format: FileInfoLine.LineFormat, ItemType: typeof(FileInfoLine)),
-            (Format: DirectoryInfoLine.LineFormat, ItemType: typeof(DirectoryInfoLine))
+            (Format: new Regex(@"\$ cd (?<dirName>.+)"),
+                Factory: match => new ChangeDirectoryCommand(match.Groups["dirName"].Value)),
+            (Format: new Regex(@"\$ ls"),
+                Factory: match => new ListCommand()),
+            (Format: new Regex(@"(?<size>\d+) (?<fileName>.+)"),
+                Factory: match => new FileInfoLine(long.Parse((string)match.Groups["size"].Value), match.Groups["fileName"].Value)),
+            (Format: new Regex(@"dir (?<dirName>.+)"),
+                Factory: match => new DirectoryInfoLine(match.Groups["dirName"].Value))
         };
 
-        var itemRef = analysisItems.First(x => x.Format.IsMatch(line));
-
-        var regexMatch = itemRef.Format.Match(line);
-
-        var item = (FileSystemAnalysisItem)Activator.CreateInstance(itemRef.ItemType, new[] { regexMatch });
-        return item!;
+        var parser = consoleLineParsers.First(x => x.Format.IsMatch(line));
+        return parser.Factory(parser.Format.Match(line));
     }
 
     public abstract class FileSystemAnalysisItem
@@ -91,9 +91,7 @@ public class NoSpaceLeftOnDevice : BaseDayModule
     public class ChangeDirectoryCommand : FileSystemAnalysisItem
     {
         public readonly string DirName;
-        public static Regex LineFormat => new Regex(@"\$ cd (?<dirName>.+)");
-
-        public ChangeDirectoryCommand(Match match) => DirName = match.Groups["dirName"].Value;
+        public ChangeDirectoryCommand(string dirName) => DirName = dirName;
         public override void Apply(DeviceFileSystem fileSystem)
         {
             if (DirName == "/")
@@ -115,11 +113,9 @@ public class NoSpaceLeftOnDevice : BaseDayModule
     [DebuggerDisplay("List contents")]
     public class ListCommand : FileSystemAnalysisItem
     {
-        public static Regex LineFormat => new Regex(@"\$ ls");
-        public ListCommand(Match match) { }
         public override void Apply(DeviceFileSystem fileSystem)
         {
-            // do nothing
+            // this does not help us build the file system; do nothing
         }
     }
     
@@ -128,12 +124,10 @@ public class NoSpaceLeftOnDevice : BaseDayModule
     {
         public readonly long Size;
         public readonly string FileName;
-        public static Regex LineFormat => new Regex(@"(?<size>\d+) (?<fileName>.+)");
-
-        public FileInfoLine(Match match)
+        public FileInfoLine(long size, string fileName)
         {
-            Size = long.Parse(match.Groups["size"].Value);
-            FileName = match.Groups["fileName"].Value;
+            Size = size;
+            FileName = fileName;
         }
 
         public override void Apply(DeviceFileSystem fileSystem)
@@ -146,9 +140,7 @@ public class NoSpaceLeftOnDevice : BaseDayModule
     public class DirectoryInfoLine : FileSystemAnalysisItem
     {
         public readonly string DirName;
-        public static Regex LineFormat => new Regex(@"dir (?<dirName>.+)");
-
-        public DirectoryInfoLine(Match match) => DirName = match.Groups["dirName"].Value;
+        public DirectoryInfoLine(string dirName) => DirName = dirName;
         public override void Apply(DeviceFileSystem fileSystem)
         {
             fileSystem.CurrentFolder.Items.Add(new DeviceFolder(DirName, fileSystem.CurrentFolder));
