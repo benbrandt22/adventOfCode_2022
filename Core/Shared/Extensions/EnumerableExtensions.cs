@@ -23,4 +23,18 @@ public static class EnumerableExtensions
             yield return currentList;
         }
     }
+
+    /// <summary>
+    /// Recursively returns the starting item and all children (recursively) based on the child selector
+    /// </summary>
+    public static IEnumerable<T> SelectRecursively<T>(this T item, Func<T, IEnumerable<T>?> childSelector)
+    {
+        yield return item;
+        var children = childSelector(item);
+        if (children == null) yield break;
+        foreach (var subItem in children.SelectMany(f => f.SelectRecursively(childSelector)))
+        {
+            yield return subItem;
+        }
+    }
 }

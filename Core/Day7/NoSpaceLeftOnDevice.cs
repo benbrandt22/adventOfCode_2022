@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Core.Shared;
+using Core.Shared.Extensions;
 using Core.Shared.Modules;
 
 namespace Core.Day7;
@@ -18,44 +19,46 @@ public class NoSpaceLeftOnDevice : BaseDayModule
     {
         WriteLine("");
         WriteLine($"Loading filesystem from input {filename}...");
+        WriteLine("");
 
-        var fileSystemFeedbackItems = TextFileLoader
+        var fileSystemAnalysisItems = TextFileLoader
             .LoadLines(filename)
             .Select(ToAnalysisItem)
             .ToList();
 
         var fileSystem = new DeviceFileSystem();
-        fileSystemFeedbackItems.ForEach(x =>
-        {
-            x.Apply(fileSystem);
-        });
+        fileSystemAnalysisItems.ForEach(x => x.Apply(fileSystem));
         
         WriteLine($"Filesystem loaded, root folder size is: {fileSystem.RootFolder.Size}");
 
-        var allFolders = fileSystem.RootFolder.AllFolders().ToList();
+        var allFolders = fileSystem.RootFolder
+            .SelectRecursively(folder => folder.Items.OfType<DeviceFolder>())
+            .ToList();
         
-        WriteLine("Part 1: find the total size of all folders with a size of at most 100000");
-        var foldersUpTo100K = allFolders.Where(f => f.Size <= 100000).ToList();
+        WriteLine("");
+        long partOneMaxFolderSize = 100000;
+        WriteLine($"Part 1: find the total size of all folders with a size of at most {partOneMaxFolderSize}");
+        var foldersUpToMaxSize = allFolders.Where(f => f.Size <= partOneMaxFolderSize).ToList();
         
-        WriteLine($"Found {foldersUpTo100K.Count} matching folders. Total size: {foldersUpTo100K.Sum(f => f.Size)}");
+        WriteLine($"Found {foldersUpToMaxSize.Count} matching folders. Total size: {foldersUpToMaxSize.Sum(f => f.Size)}");
         
         // Part 2:
         WriteLine("");
         long maxFileSystemSize = 70000000;
         long minimumNeededUnusedSpace = 30000000;
-        WriteLine("Part 2: find the ideal directory to delete...");
+        WriteLine("Part 2: find the ideal folder to delete...");
         WriteLine($"File system currently occupies {fileSystem.RootFolder.Size} out of the max {maxFileSystemSize}");
         var currentUnusedSpace = (maxFileSystemSize - fileSystem.RootFolder.Size);
         WriteLine($"Current Unused Space = {currentUnusedSpace}");
         var spaceWeNeedToFreeUp = minimumNeededUnusedSpace - currentUnusedSpace;
         WriteLine($"Need to free up at least: {spaceWeNeedToFreeUp}");
 
-        var candidateDirectoryForDeletion = fileSystem.RootFolder.AllFolders()
+        var candidateFolderForDeletion = allFolders
             .Where(f => f.Size >= spaceWeNeedToFreeUp)
             .OrderBy(f => f.Size)
             .First();
         
-        WriteLine($"Directory to delete is \"{candidateDirectoryForDeletion.Name}\" at a size of: {candidateDirectoryForDeletion.Size}");
+        WriteLine($"Folder to delete is \"{candidateFolderForDeletion.Name}\" at a size of: {candidateFolderForDeletion.Size}");
         
         WriteLine("");
         WriteLine(new string('-',80));
@@ -183,18 +186,6 @@ public class NoSpaceLeftOnDevice : BaseDayModule
         public DeviceFolder? Parent { get; }
         public List<IDeviceFileSystemItem> Items = new();
         public long Size => Items.Sum(x => x.Size);
-
-        /// <summary>
-        /// returns this folder and all lower folders recursively
-        /// </summary>
-        public IEnumerable<DeviceFolder> AllFolders()
-        {
-            yield return this;
-            foreach (var subFolder in Items.OfType<DeviceFolder>().SelectMany(f => f.AllFolders()))
-            {
-                yield return subFolder;
-            }
-        }
     }
     
     [DebuggerDisplay("{Name} (file, size={Size})")]
