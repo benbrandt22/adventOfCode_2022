@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 using System.Text.RegularExpressions;
 using Core.Shared;
 using Core.Shared.Extensions;
@@ -28,6 +29,9 @@ public class NoSpaceLeftOnDevice : BaseDayModule
 
         var fileSystem = new DeviceFileSystem();
         fileSystemAnalysisItems.ForEach(x => x.Apply(fileSystem));
+        
+        WriteLine(fileSystem.RootFolder.DisplayContents());
+        WriteLine("");
         
         WriteLine($"Filesystem loaded, root folder size is: {fileSystem.RootFolder.Size}");
 
@@ -178,6 +182,25 @@ public class NoSpaceLeftOnDevice : BaseDayModule
         public DeviceFolder? Parent { get; }
         public List<IDeviceFileSystemItem> Items = new();
         public long Size => Items.Sum(x => x.Size);
+
+        /// <summary>
+        /// Returns a text preview of the folder hierarchy with all files & folders and their sizes
+        /// </summary>
+        public string DisplayContents(int indent = 0)
+        {
+            var output = new StringBuilder();
+            output.AppendLine($"{new string(' ', indent)}- {this.Name} (dir, size={this.Size})");
+            Items.ForEach(x =>
+            {
+                var line = x switch {
+                    DeviceFile file => $"{new string(' ', indent+2)}- {file.Name} (file, size={file.Size})",
+                    DeviceFolder folder => folder.DisplayContents(indent+2),
+                    _ => throw new ArgumentOutOfRangeException(x.GetType().Name)
+                };
+                output.AppendLine(line);
+            });
+            return output.ToString().RemoveEmptyLines();
+        }
     }
     
     [DebuggerDisplay("{Name} (file, size={Size})")]
