@@ -7,5 +7,7 @@ public abstract class BaseDayModule : IDayModule
 
     internal TextWriter Output = Console.Out;
 
-    internal void WriteLine(string line) => Output.WriteLine(line);
+    internal void WriteLine(string line = "") => Output.WriteLine(line);
+
+    internal void WriteHorizontalRule(int length = 80) => WriteLine(new string('-',80));
 }

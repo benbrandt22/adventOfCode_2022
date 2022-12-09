@@ -15,7 +15,7 @@ public class CampCleanup : BaseDayModule
 
     private void Run(string filename)
     {
-        WriteLine("");
+        WriteLine();
         WriteLine($"Analyzing pairings from {filename} ...");
 
         var pairings = TextFileLoader

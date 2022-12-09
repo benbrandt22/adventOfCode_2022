@@ -18,9 +18,9 @@ public class NoSpaceLeftOnDevice : BaseDayModule
 
     private void Run(string filename)
     {
-        WriteLine("");
+        WriteLine();
         WriteLine($"Loading filesystem from input {filename}...");
-        WriteLine("");
+        WriteLine();
 
         var fileSystemAnalysisItems = TextFileLoader
             .LoadLines(filename)
@@ -31,7 +31,7 @@ public class NoSpaceLeftOnDevice : BaseDayModule
         fileSystemAnalysisItems.ForEach(x => x.Apply(fileSystem));
         
         WriteLine(fileSystem.RootFolder.DisplayContents());
-        WriteLine("");
+        WriteLine();
         
         WriteLine($"Filesystem loaded, root folder size is: {fileSystem.RootFolder.Size}");
 
@@ -39,7 +39,7 @@ public class NoSpaceLeftOnDevice : BaseDayModule
             .SelectRecursively(folder => folder.Items.OfType<DeviceFolder>())
             .ToList();
         
-        WriteLine("");
+        WriteLine();
         long partOneMaxFolderSize = 100000;
         WriteLine($"Part 1: find the total size of all folders with a size of at most {partOneMaxFolderSize}");
         var foldersUpToMaxSize = allFolders.Where(f => f.Size <= partOneMaxFolderSize).ToList();
@@ -47,7 +47,7 @@ public class NoSpaceLeftOnDevice : BaseDayModule
         WriteLine($"Found {foldersUpToMaxSize.Count} matching folders. Total size: {foldersUpToMaxSize.Sum(f => f.Size)}");
         
         // Part 2:
-        WriteLine("");
+        WriteLine();
         long maxFileSystemSize = 70000000;
         long minimumNeededUnusedSpace = 30000000;
         WriteLine("Part 2: find the ideal folder to delete...");
@@ -64,8 +64,8 @@ public class NoSpaceLeftOnDevice : BaseDayModule
         
         WriteLine($"Folder to delete is \"{candidateFolderForDeletion.Name}\" at a size of: {candidateFolderForDeletion.Size}");
         
-        WriteLine("");
-        WriteLine(new string('-',80));
+        WriteLine();
+        WriteHorizontalRule();
     }
 
     private FileSystemAnalysisItem ToAnalysisItem(string line)

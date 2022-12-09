@@ -16,7 +16,7 @@ public class RucksackReorganization : BaseDayModule
 
     private void AnalyzeRucksacks(string filename)
     {
-        WriteLine("");
+        WriteLine();
         WriteLine($"Analyzing Rucksacks from {filename} ...");
 
         var rucksacks = TextFileLoader

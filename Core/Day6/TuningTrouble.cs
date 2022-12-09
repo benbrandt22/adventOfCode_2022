@@ -14,8 +14,8 @@ public class TuningTrouble : BaseDayModule
 
     private void Run(string filename)
     {
-        WriteLine("");
-        WriteLine(new string('-', 60));
+        WriteLine();
+        WriteHorizontalRule();
         WriteLine($"Analyzing signals from {filename}...");
 
         var signals = TextFileLoader
@@ -32,7 +32,7 @@ public class TuningTrouble : BaseDayModule
 
     private void AnalyzeSignal(string signal, string markerType, int markerLength)
     {
-        WriteLine("");
+        WriteLine();
         WriteLine(signal);
         for (int i = (markerLength - 1); i < signal.Length; i++)
         {

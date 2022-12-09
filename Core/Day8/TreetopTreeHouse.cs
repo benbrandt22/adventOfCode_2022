@@ -15,21 +15,21 @@ public class TreetopTreeHouse : BaseDayModule
 
     private void Run(string filename)
     {
-        WriteLine("");
+        WriteLine();
         WriteLine($"Analyzing forest from {filename} ...");
 
         var forest = new Forest(TextFileLoader.LoadLines(filename).ToList());
 
         WriteLine($"Loaded forest of size {forest.Width} x {forest.Height}");
         
-        WriteLine("");
+        WriteLine();
         WriteLine($"Part 1: Total trees visible from outside: {forest.TotalTreesVisibleFromOutside()}");
         
-        WriteLine("");
+        WriteLine();
         WriteLine($"Part 2: Maximum \"Scenic Score\" in the forest: {forest.MaxScenicScore()}");
         
-        WriteLine("");
-        WriteLine(new string('-',80));
+        WriteLine();
+        WriteHorizontalRule();
     }
 
     [DebuggerDisplay("{Width} x {Height}")]

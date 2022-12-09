@@ -20,7 +20,7 @@ public class SupplyStacks : BaseDayModule
 
     private void Run(string filename, Action<StackCollection, CrateMoveInstruction> movingAction, string description)
     {
-        WriteLine("");
+        WriteLine();
         WriteLine($"Analyzing stack plan from {filename} with {description}...");
 
         var sections = TextFileLoader

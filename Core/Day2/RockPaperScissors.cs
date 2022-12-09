@@ -17,7 +17,7 @@ public class RockPaperScissors : BaseDayModule
 
     private void PlayRounds(string filename)
     {
-        WriteLine("");
+        WriteLine();
         WriteLine($"Playing Rock/Paper/Scissors rounds from {filename} ...");
 
         var rounds = TextFileLoader
